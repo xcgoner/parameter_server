@@ -106,8 +106,9 @@ start_scheduler() {
     # $1 host
     get_port $1
     # start scheduler
+    # echo $(pwd)
     Sch="\"role:SCHEDULER,hostname:'$1',port:$port,id:'H'\""
-    cmd="cd $(pwd) && env HEAPCHECK=strict $bin -my_node $Sch -scheduler $Sch -num_workers $worker -num_servers $server $arg & echo -e \"H\tscheduler\t$1:$port\t"'$!'"\" >> /tmp/ps-state/nodes"
+    cmd="cd $(pwd) && export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/../../third_party/lib && env HEAPCHECK=strict $bin -my_node $Sch -scheduler $Sch -num_workers $worker -num_servers $server $arg & echo -e \"H\tscheduler\t$1:$port\t"'$!'"\" >> /tmp/ps-state/nodes"
     if [[ $local ]]; then
         eval $cmd
     else
@@ -120,20 +121,22 @@ start_scheduler() {
 
 start_worker() {
     # $1 host, $2 id
+    # echo $(pwd)
     get_port $1
     # start scheduler
     N="\"role:WORKER,hostname:'$1',port:$port,id:'W$2'\""
-    cmd="cd $(pwd) && $bin -my_node $N -scheduler $Sch -num_workers $worker -num_servers $server $arg & echo -e \"W$2\tworker\t$1:$port\t"'$!'"\" >> /tmp/ps-state/nodes"
+    cmd="cd $(pwd) && export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/../../third_party/lib && $bin -my_node $N -scheduler $Sch -num_workers $worker -num_servers $server $arg & echo -e \"W$2\tworker\t$1:$port\t"'$!'"\" >> /tmp/ps-state/nodes"
     ssh $1 $cmd &
     # echo "$bin -my_node $N -scheduler $Sch -num_workers $worker -num_servers $server $arg"
 }
 
 start_server() {
     # $1 host, $2 id
+    # echo $(pwd)
     get_port $1
     # start scheduler
     N="\"role:SERVER,hostname:'$1',port:$port,id:'S$2'\""
-    cmd="cd $(pwd) && $bin -my_node $N -scheduler $Sch -num_workers $worker -num_servers $server $arg & echo -e \"S$2\tserver\t$1:$port\t"'$!'"\" >> /tmp/ps-state/nodes"
+    cmd="cd $(pwd) && export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/../../third_party/lib && $bin -my_node $N -scheduler $Sch -num_workers $worker -num_servers $server $arg & echo -e \"S$2\tserver\t$1:$port\t"'$!'"\" >> /tmp/ps-state/nodes"
     ssh $1 $cmd &
     # echo "$bin -my_node $N -scheduler $Sch -num_workers $worker -num_servers $server $arg"
 }
